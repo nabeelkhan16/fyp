@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trash_collector/configs/routes.dart';
 import 'package:trash_collector/login_screen.dart';
 
 void main() {
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyLogin(),
+        onGenerateRoute: Routes().generateRoute,
+      home: const LoginScreen(),
     );
   }
 }
