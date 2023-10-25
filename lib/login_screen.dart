@@ -6,6 +6,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -106,7 +107,6 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),
               ),
               child: const Text('Create an account'),
-
             ),
           ],
         ),
