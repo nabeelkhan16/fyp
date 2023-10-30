@@ -18,6 +18,10 @@ final class AuthenticationError extends AuthenticationState {
   AuthenticationError(this.message);
 }
 
- 
+final class InCompleteUserProfiling extends AuthenticationState {}
+
+
+
+final class UserProfileSavedSuccessfully extends AuthenticationState {}
 
 

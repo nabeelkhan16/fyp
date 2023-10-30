@@ -35,8 +35,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.blueGrey[900],
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) {
-         if(state is AuthenticationError) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
-         
+          if (state is AuthenticationError) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+          
         },
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
@@ -124,15 +124,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             prefixIcon: const Icon(Icons.lock, color: Colors.white),
                           ),
                         ),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 30.0),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               if (_confirmPasswordController.text != _passwordController.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password does not match')));
                               }
-                              BlocProvider.of<AuthenticationBloc>(context)
-                                  .add(AuthenticateWithCredentials(_emailController.text, _passwordController.text));
+                              BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationSignUp(_emailController.text, _passwordController.text));
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('INVALID CREDENTIALS')));
                             }
