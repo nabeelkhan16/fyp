@@ -101,18 +101,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                     alignment: Alignment.center,
                     height: 45.0,
-                    child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                      builder: (context, state) {
-                        return state is AuthenticationLoading
-                            ? const CircularProgressIndicator()
-                            : const Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
+                    child: BlocListener<AuthenticationBloc, AuthenticationState>(
+                      listener: (context, state) {
+                        if (state is AuthenticationError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(state.message),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       },
+                      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (context, state) {
+                          return state is AuthenticationLoading
+                              ? const CircularProgressIndicator()
+                              : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                        },
+                      ),
                     )),
               ),
             ),

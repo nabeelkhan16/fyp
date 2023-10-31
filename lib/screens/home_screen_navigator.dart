@@ -33,8 +33,8 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.location_on),
+            label: 'Bins',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

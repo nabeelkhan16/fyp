@@ -43,13 +43,7 @@ class MyApp extends StatelessWidget {
               return const HomeScreenNavigator();
             } else if (state is AuthenticationUnauthenticated) {
               return const LoginScreen();
-            } else if (state is AuthenticationLoading) {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            } else {
+            }   else {
               return const LoginScreen();
             }
           },

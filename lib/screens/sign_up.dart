@@ -36,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) {
           if (state is AuthenticationError) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
-          
+          if (state is InCompleteUserProfiling) Navigator.pop(context);
         },
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {

@@ -8,6 +8,8 @@ part 'authentication_event.dart';
 part 'authentication_state.dart';
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
+  UserModel? userModel;
+
   AuthenticationBloc() : super(AuthenticationInitial()) {
     on<AuthenticationSignUp>((event, emit) => _mapAuthenticationSignUpToState(event, emit));
     on<SaveUserProfile>((event, emit) => _mapSaveUserProfileToState(event, emit));
@@ -19,8 +21,12 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   _mapAuthenticateWithCredentialsToState(event, void Function(AuthenticationState state) emit) async {
     try {
       emit(AuthenticationLoading());
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: event.email, password: event.password);
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: event.email, password: event.password);
       if (userCredential.user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get().then((value) {
+          userModel = UserModel.fromMap(value.data()!);
+        });
+
         emit(AuthenticationAuthenticated());
       } else {
         emit(AuthenticationUnauthenticated());
@@ -37,6 +43,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       if (user != null) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).get().then((value) {
           if (value.exists) {
+            userModel = UserModel.fromMap(value.data()!);
             emit(AuthenticationAuthenticated());
           } else {
             emit(InCompleteUserProfiling());
@@ -56,6 +63,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: event.email, password: event.password);
 
       if (userCredential.user != null) {
+
         emit(InCompleteUserProfiling());
       } else {
         emit(AuthenticationUnauthenticated());
@@ -72,6 +80,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .set(event.user.toMap(), SetOptions(merge: true));
+          userModel = event.user;
+      
       emit(AuthenticationAuthenticated());
     } catch (e) {
       emit(AuthenticationError(e.toString()));

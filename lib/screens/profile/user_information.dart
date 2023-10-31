@@ -7,7 +7,6 @@ import 'package:trash_collector/models/user_model.dart';
 import 'package:trash_collector/widgets/app_bar.dart';
 import 'package:trash_collector/widgets/globle_textFiled.dart';
 import 'package:trash_collector/widgets/primary_button.dart';
- 
 
 class UserInformation extends StatefulWidget {
   final bool isFromProfile;
@@ -25,66 +24,63 @@ class _UserInformationState extends State<UserInformation> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return   Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: GlobalAppBar(context, title: 'User Information', leading: widget.isFromProfile),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.active) {
-                  if (widget.isFromProfile) {
-                    UserModel user = UserModel.fromMap(snapshot.data.data());
-                    displayNameController.text = user.name ?? '';
-                    contactNumberController.text = user.phoneNo ?? '';
-                  }
-
-                  return Column(
-                    children: [
-                      GlobalTextField(hintText: 'Display Name', controller: displayNameController),
-                      const SizedBox(height: 10),
-                      GlobalTextField(
-                        hintText: 'Contact Number',
-                        controller: contactNumberController,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-                        child: PrimaryButton(
-                          isLoading: isLoading,
-                          color: Theme.of(context).primaryColor,
-                          text: 'Update',
-                          onPressed: () async {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).set(
-                                UserModel(
-                                       
-                                        email: FirebaseAuth.instance.currentUser!.email,
-                                        name: displayNameController.text,
-                                        phoneNo: contactNumberController.text)
-                                    .toMap(),
-                                SetOptions(merge: true));
-                            setState(() {
-                              isLoading = false;
-                            });
-                            if (widget.isFromProfile) {
-                              Navigator.pop(context);
-                            } else {
-                              context.read<AuthenticationBloc>().add(AuthenticationCheck());
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  );
+    return Scaffold(
+      appBar: GlobalAppBar(context, title: 'User Information', leading: widget.isFromProfile),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0).copyWith(top: 30),
+        child: StreamBuilder(
+            stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                if (widget.isFromProfile) {
+                  UserModel user = UserModel.fromMap(snapshot.data.data());
+                  displayNameController.text = user.name ?? '';
+                  contactNumberController.text = user.phoneNo ?? '';
                 }
-                if (snapshot.hasError) return const Center(child: Text('Something went wrong'));
-                return const Center(child: CircularProgressIndicator());
-              }),
-        ),
-  
+
+                return Column(
+                  children: [
+                    GlobalTextField(hintText: 'Display Name', controller: displayNameController),
+                    const SizedBox(height: 10),
+                    GlobalTextField(
+                      hintText: 'Contact Number',
+                      controller: contactNumberController,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+                      child: PrimaryButton(
+                        isLoading: isLoading,
+                        color: Theme.of(context).primaryColor,
+                        text: 'Update',
+                        onPressed: () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).set(
+                              UserModel(
+                                      email: FirebaseAuth.instance.currentUser!.email,
+                                      name: displayNameController.text,
+                                      phoneNo: contactNumberController.text)
+                                  .toMap(),
+                              SetOptions(merge: true));
+                          setState(() {
+                            isLoading = false;
+                          });
+                          if (widget.isFromProfile) {
+                            Navigator.pop(context);
+                          } else {
+                            context.read<AuthenticationBloc>().add(AuthenticationCheck());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }
+              if (snapshot.hasError) return const Center(child: Text('Something went wrong'));
+              return const Center(child: CircularProgressIndicator());
+            }),
+      ),
     );
   }
 }
