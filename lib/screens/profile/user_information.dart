@@ -58,10 +58,19 @@ class _UserInformationState extends State<UserInformation> {
                           });
                           await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).set(
                               UserModel(
-                                      email: FirebaseAuth.instance.currentUser!.email,
-                                      name: displayNameController.text,
-                                      phoneNo: contactNumberController.text)
-                                  .toMap(),
+                                email: FirebaseAuth.instance.currentUser!.email,
+                                name: displayNameController.text,
+                                phoneNo: contactNumberController.text,
+                                isCollector: context.read<AuthenticationBloc>().userModel != null
+                                    ? context.read<AuthenticationBloc>().userModel!.isCollector
+                                    : false,
+                                isAdmin: context.read<AuthenticationBloc>().userModel != null
+                                    ? context.read<AuthenticationBloc>().userModel!.isAdmin
+                                    : false,
+                                isApproved: context.read<AuthenticationBloc>().userModel != null
+                                    ? context.read<AuthenticationBloc>().userModel!.isApproved
+                                    : false,
+                              ).toMap(),
                               SetOptions(merge: true));
                           setState(() {
                             isLoading = false;

@@ -9,20 +9,22 @@ class UserModel {
   String? phoneNo;
   String? city;
   String? area;
-  bool isCollector;
+  bool? isCollector;
+  bool? isApproved;
+  bool? isAdmin;
   UserModel({
     this.name,
     this.email,
-  
     this.uId,
     this.image,
     this.phoneNo,
     this.city,
     this.area,
-    this.isCollector = false,
+    this.isCollector,
+    this.isApproved,
+    this.isAdmin,
   });
-
-   
+  
 
   UserModel copyWith({
     String? name,
@@ -33,6 +35,8 @@ class UserModel {
     String? city,
     String? area,
     bool? isCollector,
+    bool? isApproved,
+    bool? isAdmin,
   }) {
     return UserModel(
       name: name ?? this.name,
@@ -43,6 +47,8 @@ class UserModel {
       city: city ?? this.city,
       area: area ?? this.area,
       isCollector: isCollector ?? this.isCollector,
+      isApproved: isApproved ?? this.isApproved,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 
@@ -56,6 +62,8 @@ class UserModel {
       'city': city,
       'area': area,
       'isCollector': isCollector,
+      'isApproved': isApproved,
+      'isAdmin': isAdmin,
     };
   }
 
@@ -68,7 +76,9 @@ class UserModel {
       phoneNo: map['phoneNo'] != null ? map['phoneNo'] as String : null,
       city: map['city'] != null ? map['city'] as String : null,
       area: map['area'] != null ? map['area'] as String : null,
-      isCollector: map['isCollector'] as bool,
+      isCollector: map['isCollector'] != null ? map['isCollector'] as bool : false,
+      isApproved: map['isApproved'] != null ? map['isApproved'] as bool : false,
+      isAdmin: map['isAdmin'] != null ? map['isAdmin'] as bool : false,
     );
   }
 
@@ -78,7 +88,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, uId: $uId, image: $image, phoneNo: $phoneNo, city: $city, area: $area, isCollector: $isCollector)';
+    return 'UserModel(name: $name, email: $email, uId: $uId, image: $image, phoneNo: $phoneNo, city: $city, area: $area, isCollector: $isCollector, isApproved: $isApproved, isAdmin: $isAdmin)';
   }
 
   @override
@@ -93,7 +103,9 @@ class UserModel {
       other.phoneNo == phoneNo &&
       other.city == city &&
       other.area == area &&
-      other.isCollector == isCollector;
+      other.isCollector == isCollector &&
+      other.isApproved == isApproved &&
+      other.isAdmin == isAdmin;
   }
 
   @override
@@ -105,6 +117,8 @@ class UserModel {
       phoneNo.hashCode ^
       city.hashCode ^
       area.hashCode ^
-      isCollector.hashCode;
+      isCollector.hashCode ^
+      isApproved.hashCode ^
+      isAdmin.hashCode;
   }
 }

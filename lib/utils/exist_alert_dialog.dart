@@ -15,6 +15,7 @@ showModelBottomSheet(BuildContext context, String fileName) async {
             CupertinoActionSheetAction(
               onPressed: () async {
                 var image = await _getFromGallery(fileName);
+             
                 Navigator.of(context).pop(image);
               },
               child: const Text('Photo Library'),

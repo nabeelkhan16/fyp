@@ -193,6 +193,8 @@ class _UserInformationFormState extends State<UserInformationForm> {
                         city: _cityController.text,
                         area: _areaController.text,
                         isCollector: _isCollector == 1 ? true : false,
+                        isAdmin: false,
+                        isApproved: true,
                         uId: FirebaseAuth.instance.currentUser!.uid,
                       )));
                     },
