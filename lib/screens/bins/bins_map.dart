@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
+import 'package:trash_collector/blocs/bin/bins_bloc.dart';
+import 'package:trash_collector/screens/bins/add_bin_screen.dart';
+import 'package:trash_collector/screens/bins/location_utils.dart';
+import 'package:trash_collector/widgets/app_bar.dart';
 
 class BinMapScreen extends StatefulWidget {
   const BinMapScreen({super.key});
@@ -14,35 +18,65 @@ class BinMapScreen extends StatefulWidget {
 
 class _BinMapScreenState extends State<BinMapScreen> {
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
+  CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
 
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799, target: LatLng(37.43296265331129, -122.08832357078792), tilt: 59.440717697143555, zoom: 19.151926040649414);
+  @override
+  void initState() {
+    context.read<BinsBloc>().add(GetAllBins());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-      ),
-      floatingActionButton:context.read<AuthenticationBloc>().userModel!.isAdmin!? FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: const Text('Add Bin'),
-        icon: const Icon(Icons.add),
-      ):const SizedBox()
-    );
-  }
-
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+        backgroundColor: Colors.transparent,
+        body: BlocBuilder<BinsBloc, BinsState>(
+          builder: (context, state) {
+            if (state is BinsLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (state is BinsLoaded) {
+              _kGooglePlex = CameraPosition(
+                target: LatLng(state.bins.first.location!.latitude, state.bins.first.location!.longitude),
+                zoom: 14.4746,
+              );
+            }
+            return GoogleMap(
+              zoomControlsEnabled: false,
+              markers: state is BinsLoaded
+                  ? state.bins
+                      .map((e) => Marker(
+                            markerId: MarkerId(e.id),
+                            position: LatLng(e.location!.latitude, e.location!.longitude),
+                            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                            infoWindow: InfoWindow(
+                              title: e.name!,
+                              snippet: e.address!,
+                            ),
+                          ))
+                      .toSet()
+                  : {},
+              mapType: MapType.normal,
+              initialCameraPosition: _kGooglePlex,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+            );
+          },
+        ),
+        floatingActionButton: context.read<AuthenticationBloc>().userModel!.isAdmin!
+            ? FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const AddBinScreen()));
+                },
+                label: const Text('Add Bin'),
+                icon: const Icon(Icons.add),
+              )
+            : const SizedBox());
   }
 }

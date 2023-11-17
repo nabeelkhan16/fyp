@@ -46,10 +46,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.blue.shade900,
                     Colors.blue.shade800,
                     Colors.blue.shade700,
                     Colors.blue.shade600,
+                    Colors.blue.shade500,
                   ],
                 ),
               ),

@@ -9,7 +9,7 @@ GlobalAppBar(BuildContext context,
       width: 12,
     )}) {
   return AppBar(
-    backgroundColor: Theme.of(context).primaryColor,
+    forceMaterialTransparency: true,
     centerTitle: true,
     elevation: 0,
     flexibleSpace: ClipRect(
