@@ -131,7 +131,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               if (_confirmPasswordController.text != _passwordController.text) {
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password does not match')));
                               }
-                              BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationSignUp(_emailController.text, _passwordController.text));
+                              BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationSignUp(_emailController.text.trim(), _passwordController.text.trim()));
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('INVALID CREDENTIALS')));
                             }

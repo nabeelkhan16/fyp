@@ -59,7 +59,6 @@ class _AddBinScreenState extends State<AddBinScreen> {
           ),
         ),
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           body: Container(
             height: MediaQuery.of(context).size.height,
@@ -80,7 +79,7 @@ class _AddBinScreenState extends State<AddBinScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50.0),
+                  const SizedBox(height: 30.0),
                   Padding(
                     padding: EdgeInsets.all(12.0),
                     child: Row(
@@ -92,9 +91,8 @@ class _AddBinScreenState extends State<AddBinScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20.0),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                     child: TextField(
                       controller: _nameController,
                       cursorColor: Colors.blue.shade900,
@@ -111,7 +109,7 @@ class _AddBinScreenState extends State<AddBinScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                     child: TextField(
                       controller: _addressController,
                       cursorColor: Colors.blue.shade900,
@@ -128,7 +126,7 @@ class _AddBinScreenState extends State<AddBinScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                     child: DropdownSearch<String>(
                       itemAsString: (item) => item.toString(),
                       asyncItems: (text) async {

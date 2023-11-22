@@ -87,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   context.read<AuthenticationBloc>().add(AuthenticateWithCredentials(
-                        _emailController.text,
-                        _passwordController.text,
+                        _emailController.text.trim(),
+                        _passwordController.text.trim(),
                       ));
                 },
                 style: ElevatedButton.styleFrom(

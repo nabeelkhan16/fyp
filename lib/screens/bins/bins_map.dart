@@ -30,7 +30,6 @@ class _BinMapScreenState extends State<BinMapScreen> {
     context.read<BinsBloc>().add(GetAllBins());
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
