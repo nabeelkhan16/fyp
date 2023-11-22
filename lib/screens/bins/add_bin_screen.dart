@@ -81,9 +81,16 @@ class _AddBinScreenState extends State<AddBinScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 50.0),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Center(child: Text("Add Bin", style: TextStyle(color: Colors.white, fontSize: 24.0, fontWeight: FontWeight.bold))),
+                  Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(onTap: () => Navigator.pop(context), child: Icon(Icons.arrow_back, color: Colors.white, size: 30.0)),
+                        Center(child: Text("Add Bin", style: TextStyle(color: Colors.white, fontSize: 24.0, fontWeight: FontWeight.bold))),
+                        Container(width: 30.0, height: 30.0, color: Colors.transparent)
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20.0),
                   Padding(

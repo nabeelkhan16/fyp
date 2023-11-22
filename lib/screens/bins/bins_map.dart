@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,6 +18,7 @@ class BinMapScreen extends StatefulWidget {
 }
 
 class _BinMapScreenState extends State<BinMapScreen> {
+  PageController? _pageController = PageController(initialPage: 0, viewportFraction: 0.8);
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -35,37 +37,39 @@ class _BinMapScreenState extends State<BinMapScreen> {
         backgroundColor: Colors.transparent,
         body: BlocBuilder<BinsBloc, BinsState>(
           builder: (context, state) {
-            if (state is BinsLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
             if (state is BinsLoaded) {
               _kGooglePlex = CameraPosition(
                 target: LatLng(state.bins.first.location!.latitude, state.bins.first.location!.longitude),
                 zoom: 14.4746,
               );
+
+              return Stack(
+                children: [
+                  GoogleMap(
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
+                    markers: state.bins
+                        .map((e) => Marker(
+                              markerId: MarkerId(e.id),
+                              position: LatLng(e.location!.latitude, e.location!.longitude),
+                              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                              infoWindow: InfoWindow(
+                                title: e.name!,
+                                snippet: e.address!,
+                              ),
+                            ))
+                        .toSet(),
+                    mapType: MapType.normal,
+                    initialCameraPosition: _kGooglePlex,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
+                  ),
+                ],
+              );
             }
-            return GoogleMap(
-              zoomControlsEnabled: false,
-              markers: state is BinsLoaded
-                  ? state.bins
-                      .map((e) => Marker(
-                            markerId: MarkerId(e.id),
-                            position: LatLng(e.location!.latitude, e.location!.longitude),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-                            infoWindow: InfoWindow(
-                              title: e.name!,
-                              snippet: e.address!,
-                            ),
-                          ))
-                      .toSet()
-                  : {},
-              mapType: MapType.normal,
-              initialCameraPosition: _kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
+            return const Center(
+              child: CircularProgressIndicator(),
             );
           },
         ),

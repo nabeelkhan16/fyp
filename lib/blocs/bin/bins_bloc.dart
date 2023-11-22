@@ -16,7 +16,7 @@ class BinsBloc extends Bloc<BinsEvent, BinsState> {
   _getAllBins(GetAllBins event, Emitter<BinsState> emit) async{
     try {
       emit(BinsLoading());
-    await  getLocation();
+      await  getLocation();
       var bins = await FirebaseFirestore.instance.collection('bins').get();
       emit(BinsLoaded(bins.docs.map((e) => BinModel.fromMap(e.data())).toList()));
     } catch (e) {
