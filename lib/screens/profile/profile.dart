@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
+import 'package:trash_collector/screens/profile/settings.dart';
 import 'package:trash_collector/screens/profile/user_information.dart';
 
 import 'package:trash_collector/utils/exist_alert_dialog.dart';
@@ -29,181 +30,250 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-      child: Scaffold(
-        appBar: GlobalAppBar(context, title: "Profile", leading: false),
-        backgroundColor: Colors.transparent,
-        body: StreamBuilder(
-            stream: FirebaseAuth.instance.userChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircleAvatar(
-                      maxRadius: 65,
-                      child: Icon(
-                        Icons.person,
-                        size: 100,
-                        color: Colors.white,
-                      )),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: GlobalAppBar(
+            context,
+            title: "Profile",
+            leading: false,
+            chatcreen: false,
+            trallingWidget: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileSettings()),
                 );
-              }
-              return Column(
-                children: [
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                          onTap: () async {
-                            File? file = await showModelBottomSheet(context, 'profile/${FirebaseAuth.instance.currentUser!.uid}');
-                            if (file != null) {
-                              await FirebaseStorage.instance
-                                  .ref()
-                                  .child('profile/${FirebaseAuth.instance.currentUser!.uid}')
-                                  .putFile(File(file.path))
-                                  .then((value) async {
-                                String url = await value.ref.getDownloadURL();
-                                await FirebaseAuth.instance.currentUser!.updatePhotoURL(url);
-                              });
-                            }
-                          },
-                          child: CircleAvatar(
-                              maxRadius: 65,
-                              child: FirebaseAuth.instance.currentUser!.photoURL != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CachedNetworkImage(
-                                        width: 130,
-                                        height: 130,
-                                        imageUrl: FirebaseAuth.instance.currentUser!.photoURL!,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) => const Center(child: CircularProgressIndicator.adaptive()),
-                                        errorWidget: (context, url, error) => const Icon(Icons.error),
-                                      ))
-                                  : const Icon(
-                                      Icons.person,
-                                      size: 100,
-                                      color: Colors.white,
-                                    )))
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        FirebaseAuth.instance.currentUser!.displayName ?? "Put Name",
-                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 26),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        FirebaseAuth.instance.currentUser!.email ?? "Put Email",
-                        style: const TextStyle(fontSize: 18),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Expanded(
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(left: 18, right: 18, bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.5),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const UserInformation()));
-                            },
-                            leading: Icon(
-                              Icons.person_outline_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            title: const Text(
-                              'User Information',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            trailing: Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(15.0),
+                child: Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          body: NestedScrollView(
+            headerSliverBuilder: ((context, innerBoxIsScrolled) {
+              return <Widget>[
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverAppBar(
+                    backgroundColor: Colors.blue.shade800,
+                    title: StreamBuilder(
+                        stream: FirebaseAuth.instance.userChanges(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            );
+                          }
+                          return Column(
+                            children: [
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  InkWell(
+                                    onTap: () async {
+                                      File? file = await showModelBottomSheet(
+                                          context,
+                                          'profile/${FirebaseAuth.instance.currentUser!.uid}');
+                                      if (file != null) {
+                                        await FirebaseStorage.instance
+                                            .ref()
+                                            .child(
+                                                'profile/${FirebaseAuth.instance.currentUser!.uid}')
+                                            .putFile(File(file.path))
+                                            .then((value) async {
+                                          String url =
+                                              await value.ref.getDownloadURL();
+                                          await FirebaseAuth
+                                              .instance.currentUser!
+                                              .updatePhotoURL(url);
+                                        });
+                                      }
+                                    },
+                                    child: CircleAvatar(
+                                      maxRadius: 50,
+                                      child: FirebaseAuth.instance.currentUser!
+                                                  .photoURL !=
+                                              null
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              child: CachedNetworkImage(
+                                                width: 130,
+                                                height: 130,
+                                                imageUrl: FirebaseAuth.instance
+                                                    .currentUser!.photoURL!,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    const Center(
+                                                  child:
+                                                      CircularProgressIndicator
+                                                          .adaptive(),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.error),
+                                              ))
+                                          : const Icon(
+                                              Icons.person,
+                                              size: 70,
+                                              color: Colors.white,
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Name",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    FirebaseAuth.instance.currentUser!.email ??
+                                        "Put Email",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white.withOpacity(.5)),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 45),
+                            ],
+                          );
+                        }),
+                    toolbarHeight: 180,
+                    collapsedHeight: 190,
+                    expandedHeight: 250.0,
+                    pinned: true,
+                    forceElevated: innerBoxIsScrolled,
+                    bottom: const TabBar(
+                      unselectedLabelColor: Colors.white,
+                      labelColor: Colors.white,
+                      indicatorColor: Colors.white,
+                      tabs: [
+                        Tab(
+                          text: 'Collector',
                         ),
-                        const SizedBox(
-                          height: 5,
+                        Tab(
+                          text: 'User',
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 18, right: 18, bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.5),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              // Navigator.pushNamed(context, Routes.settings);
-                            },
-                            leading: Icon(
-                              Icons.privacy_tip_sharp,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            title: const Text(
-                              'Settings',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            trailing: Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 18, right: 18, bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.5),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ListTile(
-                            onTap: () async {
-                              context.read<AuthenticationBloc>().add(AuthenticationLogout());
-                            },
-                            leading: Icon(
-                              Icons.logout,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            title: const Text(
-                              'Logout',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            trailing: Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        )
                       ],
                     ),
-                  )
-                ],
-              );
+                  ),
+                ),
+              ];
             }),
+            body: TabBarView(
+              children: [
+                ListView.builder(itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      title: const Text(
+                        "Collector Name",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 20),
+                      ),
+                      subtitle: Text(
+                        "Collector location address",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                            color: Colors.white.withOpacity(.5), fontSize: 16),
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                ListView.builder(itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      title: const Text(
+                        "User Name",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 20),
+                      ),
+                      subtitle: Text(
+                        "User bin slocation address",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                            color: Colors.white.withOpacity(.5), fontSize: 16),
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+         
+        ),
       ),
     );
   }

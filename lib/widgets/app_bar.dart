@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 GlobalAppBar(BuildContext context,
     {required String title,
     bool leading = true,
+    bool chatcreen = true,
     Widget trallingWidget = const SizedBox(
       width: 12,
     )}) {
@@ -25,26 +26,41 @@ GlobalAppBar(BuildContext context,
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-              child: const Padding(
-                padding: EdgeInsets.all(2.0),
-                child: Icon(
-                  Icons.arrow_back_rounded,
-                  color: Colors.black,
-                  size: 25,
-                ),
-              ),
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
             ),
           )
         : const SizedBox(),
-    title: Text(
-      title,
-      style: TextStyle(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        fontSize: 18,
-      ),
-    ),
+    title: chatcreen
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey.shade400,
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 24,
+                ),
+              ),
+            ],
+          )
+        : Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              fontSize: 28,
+            ),
+          ),
     actions: [trallingWidget],
   );
 }
