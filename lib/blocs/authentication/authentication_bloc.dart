@@ -7,7 +7,8 @@ import 'package:trash_collector/models/user_model.dart';
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
-class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
+
+ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   UserModel? userModel;
 
   AuthenticationBloc() : super(AuthenticationInitial()) {

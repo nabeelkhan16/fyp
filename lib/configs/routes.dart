@@ -3,7 +3,7 @@ import 'package:trash_collector/screens/login_screen.dart';
 import 'package:trash_collector/screens/profile/profile.dart';
 import 'package:trash_collector/screens/profile/settings.dart';
 import 'package:trash_collector/screens/sign_up.dart';
-import 'package:trash_collector/screens/home/chat.dart';
+import 'package:trash_collector/screens/home/chat_screen.dart';
 
 class Routes {
   Route<dynamic> generateRoute(RouteSettings routeSettings) {

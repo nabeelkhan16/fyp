@@ -21,8 +21,10 @@ GlobalAppBar(BuildContext context,
         ),
       ),
     ),
+    leadingWidth: 60,
     leading: leading
         ? IconButton(
+            padding: EdgeInsets.zero,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -37,19 +39,19 @@ GlobalAppBar(BuildContext context,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: 16,
                 backgroundColor: Colors.grey.shade400,
                 child: const Icon(
                   Icons.person,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 5),
               Text(
                 title,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 24,
+                  fontSize: 18,
                 ),
               ),
             ],

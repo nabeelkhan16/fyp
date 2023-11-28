@@ -32,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           const SizedBox(
-            height: 10,
+            height: 5,
           ),
           const Text(
             'username',
@@ -41,19 +41,18 @@ class _ChatScreenState extends State<ChatScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
           Text(
             'You and username became friends on 12/12/2021',
             style: TextStyle(color: Colors.grey.shade600),
+          ),
+          const SizedBox(
+            height: 10,
           ),
           Expanded(
             child: ListView(
               children: const [
                 MessageBubble(
-                  text:
-                      'hello this the seending text with mmultiple lines code is working fine ',
+                  text: 'hello this the seending text with mmultiple lines code is working fine ',
                   isMe: true,
                 ),
                 MessageBubble(
@@ -119,8 +118,7 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Material(
             elevation: 5.0,

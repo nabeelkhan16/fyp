@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trash_collector/constant.dart';
-import 'package:trash_collector/screens/home/chat.dart';
+import 'package:trash_collector/screens/home/chat_screen.dart';
 import 'package:trash_collector/widgets/app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -44,20 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextFormField(
-                controller: _searchController,
-                decoration: kSearchTextField.copyWith(
-                  filled: true,
-                  hintText: 'Search for a username',
-                  suffixIcon: const Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
             Expanded(
               child: ListView.separated(
                   itemBuilder: ((context, index) {
@@ -65,8 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => const ChatScreen()),
+                          MaterialPageRoute(builder: (context) => const ChatScreen()),
                         );
                       },
                       child: ListTile(
