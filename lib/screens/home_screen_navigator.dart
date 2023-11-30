@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:trash_collector/screens/bins/bins_map.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
+import 'package:trash_collector/screens/bins/bins_map_screen.dart';
 import 'package:trash_collector/screens/home/home_screen.dart';
 import 'package:trash_collector/screens/profile/profile.dart';
 
@@ -13,7 +15,7 @@ class HomeScreenNavigator extends StatefulWidget {
 class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
   int _selectedIndex = 0;
 
-  final List<Widget> _widgetOptions = const <Widget>[HomeScreen(), BinMapScreen(), ProfileScreen()];
+  final List<Widget> _widgetOptions = const <Widget>[HomeScreen(),  BinMapScreen(), ProfileScreen()];
 
   void _onItemTapped(int index) {
     setState(() {

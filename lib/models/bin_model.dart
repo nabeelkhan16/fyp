@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BinModel {
-
   String id;
   String? name;
   String? description;
@@ -17,6 +16,7 @@ class BinModel {
   String? updatedBy;
   String? updatedAt;
   String? assingedTo;
+  String? assignedToName;
   BinModel({
     required this.id,
     this.name,
@@ -30,8 +30,8 @@ class BinModel {
     this.updatedBy,
     this.updatedAt,
     this.assingedTo,
+    this.assignedToName,
   });
-  
 
   BinModel copyWith({
     String? id,
@@ -46,6 +46,7 @@ class BinModel {
     String? updatedBy,
     String? updatedAt,
     String? assingedTo,
+    String? assignedToName,
   }) {
     return BinModel(
       id: id ?? this.id,
@@ -60,6 +61,7 @@ class BinModel {
       updatedBy: updatedBy ?? this.updatedBy,
       updatedAt: updatedAt ?? this.updatedAt,
       assingedTo: assingedTo ?? this.assingedTo,
+      assignedToName: assignedToName ?? this.assignedToName,
     );
   }
 
@@ -69,7 +71,7 @@ class BinModel {
       'name': name,
       'description': description,
       'address': address,
-      'location': location ,
+      'location': location,
       'image': image,
       'status': status,
       'createdBy': createdBy,
@@ -77,6 +79,7 @@ class BinModel {
       'updatedBy': updatedBy,
       'updatedAt': updatedAt,
       'assingedTo': assingedTo,
+      'assignedToName': assignedToName,
     };
   }
 
@@ -94,6 +97,7 @@ class BinModel {
       updatedBy: map['updatedBy'] != null ? map['updatedBy'] as String : null,
       updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
       assingedTo: map['assingedTo'] != null ? map['assingedTo'] as String : null,
+      assignedToName: map['assignedToName'] != null ? map['assignedToName'] as String : null,
     );
   }
 
@@ -109,35 +113,34 @@ class BinModel {
   @override
   bool operator ==(covariant BinModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.description == description &&
-      other.address == address &&
-      other.location == location &&
-      other.image == image &&
-      other.status == status &&
-      other.createdBy == createdBy &&
-      other.createdAt == createdAt &&
-      other.updatedBy == updatedBy &&
-      other.updatedAt == updatedAt &&
-      other.assingedTo == assingedTo;
+
+    return other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.address == address &&
+        other.location == location &&
+        other.image == image &&
+        other.status == status &&
+        other.createdBy == createdBy &&
+        other.createdAt == createdAt &&
+        other.updatedBy == updatedBy &&
+        other.updatedAt == updatedAt &&
+        other.assingedTo == assingedTo;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      description.hashCode ^
-      address.hashCode ^
-      location.hashCode ^
-      image.hashCode ^
-      status.hashCode ^
-      createdBy.hashCode ^
-      createdAt.hashCode ^
-      updatedBy.hashCode ^
-      updatedAt.hashCode ^
-      assingedTo.hashCode;
+        name.hashCode ^
+        description.hashCode ^
+        address.hashCode ^
+        location.hashCode ^
+        image.hashCode ^
+        status.hashCode ^
+        createdBy.hashCode ^
+        createdAt.hashCode ^
+        updatedBy.hashCode ^
+        updatedAt.hashCode ^
+        assingedTo.hashCode;
   }
 }

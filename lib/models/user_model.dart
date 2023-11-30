@@ -1,6 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+enum AccountType { collector, user, admin }
+
 class UserModel {
   String? name;
   String? email;
@@ -9,9 +13,11 @@ class UserModel {
   String? phoneNo;
   String? city;
   String? area;
-  bool? isCollector;
+  AccountType? accountType;
   bool? isApproved;
-  bool? isAdmin;
+  GeoPoint? location;
+  List<String>? assignedBins;
+
   UserModel({
     this.name,
     this.email,
@@ -20,11 +26,11 @@ class UserModel {
     this.phoneNo,
     this.city,
     this.area,
-    this.isCollector,
+    this.location,
     this.isApproved,
-    this.isAdmin,
+    this.accountType,
+    this.assignedBins,
   });
-  
 
   UserModel copyWith({
     String? name,
@@ -37,6 +43,9 @@ class UserModel {
     bool? isCollector,
     bool? isApproved,
     bool? isAdmin,
+    AccountType? accountType,
+    GeoPoint? location,
+    List<String>? assignedBins,
   }) {
     return UserModel(
       name: name ?? this.name,
@@ -46,9 +55,10 @@ class UserModel {
       phoneNo: phoneNo ?? this.phoneNo,
       city: city ?? this.city,
       area: area ?? this.area,
-      isCollector: isCollector ?? this.isCollector,
+      location: location ?? this.location,
       isApproved: isApproved ?? this.isApproved,
-      isAdmin: isAdmin ?? this.isAdmin,
+      accountType: accountType ?? this.accountType,
+      assignedBins: assignedBins ?? this.assignedBins,
     );
   }
 
@@ -61,9 +71,10 @@ class UserModel {
       'phoneNo': phoneNo,
       'city': city,
       'area': area,
-      'isCollector': isCollector,
+      'location': location,
       'isApproved': isApproved,
-      'isAdmin': isAdmin,
+      'accountType': accountType.toString().split('.').last,
+      'assignedBins': assignedBins,
     };
   }
 
@@ -76,9 +87,15 @@ class UserModel {
       phoneNo: map['phoneNo'] != null ? map['phoneNo'] as String : null,
       city: map['city'] != null ? map['city'] as String : null,
       area: map['area'] != null ? map['area'] as String : null,
-      isCollector: map['isCollector'] != null ? map['isCollector'] as bool : false,
+      location: map['location'] != null ? map['location'] as GeoPoint : null,
       isApproved: map['isApproved'] != null ? map['isApproved'] as bool : false,
-      isAdmin: map['isAdmin'] != null ? map['isAdmin'] as bool : false,
+      accountType: map['accountType'] != null
+          ? map['accountType'] == 'collector'
+              ? AccountType.collector
+              : map['accountType'] == 'admin'
+                  ? AccountType.admin
+                  : AccountType.user
+          : AccountType.user,
     );
   }
 
@@ -88,37 +105,35 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, uId: $uId, image: $image, phoneNo: $phoneNo, city: $city, area: $area, isCollector: $isCollector, isApproved: $isApproved, isAdmin: $isAdmin)';
+    return 'UserModel(name: $name, email: $email, uId: $uId, image: $image, phoneNo: $phoneNo, city: $city, area: $area,  isApproved: $isApproved,  accountType: $accountType)';
   }
 
   @override
   bool operator ==(covariant UserModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.name == name &&
-      other.email == email &&
-      other.uId == uId &&
-      other.image == image &&
-      other.phoneNo == phoneNo &&
-      other.city == city &&
-      other.area == area &&
-      other.isCollector == isCollector &&
-      other.isApproved == isApproved &&
-      other.isAdmin == isAdmin;
+
+    return other.name == name &&
+        other.email == email &&
+        other.uId == uId &&
+        other.image == image &&
+        other.phoneNo == phoneNo &&
+        other.city == city &&
+        other.area == area &&
+        other.location == location &&
+        other.isApproved == isApproved &&
+        other.accountType == accountType;
   }
 
   @override
   int get hashCode {
     return name.hashCode ^
-      email.hashCode ^
-      uId.hashCode ^
-      image.hashCode ^
-      phoneNo.hashCode ^
-      city.hashCode ^
-      area.hashCode ^
-      isCollector.hashCode ^
-      isApproved.hashCode ^
-      isAdmin.hashCode;
+        email.hashCode ^
+        uId.hashCode ^
+        image.hashCode ^
+        phoneNo.hashCode ^
+        city.hashCode ^
+        area.hashCode ^
+        isApproved.hashCode ^
+        accountType.hashCode;
   }
 }

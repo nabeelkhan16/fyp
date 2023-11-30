@@ -7,8 +7,7 @@ import 'package:trash_collector/models/user_model.dart';
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
-
- class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
+class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   UserModel? userModel;
 
   AuthenticationBloc() : super(AuthenticationInitial()) {
@@ -25,7 +24,12 @@ part 'authentication_state.dart';
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: event.email, password: event.password);
       if (userCredential.user != null) {
         await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get().then((value) {
-          userModel = UserModel.fromMap(value.data()!);
+          if (value.exists) {
+            userModel = UserModel.fromMap(value.data()!);
+            emit(AuthenticationAuthenticated());
+          } else {
+            emit(InCompleteUserProfiling());
+          }
         });
 
         emit(AuthenticationAuthenticated());
@@ -64,7 +68,6 @@ part 'authentication_state.dart';
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: event.email, password: event.password);
 
       if (userCredential.user != null) {
-
         emit(InCompleteUserProfiling());
       } else {
         emit(AuthenticationUnauthenticated());
@@ -81,8 +84,8 @@ part 'authentication_state.dart';
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .set(event.user.toMap(), SetOptions(merge: true));
-          userModel = event.user;
-      
+      userModel = event.user;
+
       emit(AuthenticationAuthenticated());
     } catch (e) {
       emit(AuthenticationError(e.toString()));

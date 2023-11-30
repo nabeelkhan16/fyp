@@ -246,8 +246,14 @@ class _AddBinScreenState extends State<AddBinScreen> {
                                     address: _addressController.text,
                                     location: GeoPoint(locationData.latitude!, locationData.longitude!),
                                     assingedTo: collector.uId,
+                                    assignedToName: collector.name,
                                   ),
                                 ));
+                                FirebaseFirestore.instance.collection("users").doc(collector.uId).update(
+                                  {
+                                    "assignedBins": FieldValue.arrayUnion([ref.id])
+                                  },
+                                );
                               },
                               color: Theme.of(context).primaryColor),
                         );

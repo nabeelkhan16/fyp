@@ -61,12 +61,9 @@ class _UserInformationState extends State<UserInformation> {
                                 email: FirebaseAuth.instance.currentUser!.email,
                                 name: displayNameController.text,
                                 phoneNo: contactNumberController.text,
-                                isCollector: context.read<AuthenticationBloc>().userModel != null
-                                    ? context.read<AuthenticationBloc>().userModel!.isCollector
-                                    : false,
-                                isAdmin: context.read<AuthenticationBloc>().userModel != null
-                                    ? context.read<AuthenticationBloc>().userModel!.isAdmin
-                                    : false,
+                               accountType:   context.read<AuthenticationBloc>().userModel != null
+                                    ? context.read<AuthenticationBloc>().userModel!.accountType
+                                    : AccountType.user,
                                 isApproved: context.read<AuthenticationBloc>().userModel != null
                                     ? context.read<AuthenticationBloc>().userModel!.isApproved
                                     : false,
