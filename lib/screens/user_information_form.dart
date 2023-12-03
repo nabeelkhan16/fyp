@@ -215,7 +215,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                                   zoom: 16.4746,
                                 ),
                                 onMapCreated: (GoogleMapController controller) {
-                                  if (!_controller.isCompleted) _controller.complete(controller);
+                                  _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
                                 },
                                 markers: markers,
                                 onTap: (LatLng latLng) {
@@ -239,7 +239,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                                 }),
                           ),
                         ))
-                    : SizedBox(),
+                    : const SizedBox(),
                 const SizedBox(height: 30.0),
                 Center(
                   child: ElevatedButton(

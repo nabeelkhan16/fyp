@@ -11,6 +11,7 @@ import 'package:trash_collector/blocs/bin/bins_bloc.dart';
 import 'package:trash_collector/models/bin_model.dart';
 import 'package:trash_collector/models/user_model.dart';
 import 'package:trash_collector/screens/bins/add_bin_screen.dart';
+import 'package:trash_collector/screens/bins/bin_details.dart';
 
 class BinMapScreen extends StatefulWidget {
   const BinMapScreen({super.key});
@@ -79,7 +80,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
                     mapType: MapType.normal,
                     initialCameraPosition: _kGooglePlex,
                     onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
+                      _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
                     },
                   ),
                   Positioned(
@@ -103,109 +104,117 @@ class _BinMapScreenState extends State<BinMapScreen> {
                       controller: _pageController,
                       itemBuilder: (context, index) {
                         currentBin = state.bins[index];
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6)]),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // const Text('User Name'),
-                                      Text(state.bins[index].name!,
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
-                                      // const Text('Address'),
-                                      Text(state.bins[index].address!, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                                      const SizedBox(height: 10),
-                                      state.bins[index].assingedTo == null
-                                          ? Row(
-                                              children: [
-                                                Text("Assigned to:",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleSmall
-                                                        ?.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
-                                                const SizedBox(width: 10),
-                                                Text("No One", style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red)),
-                                              ],
-                                            )
-                                          : FutureBuilder<DocumentSnapshot>(
-                                              future: FirebaseFirestore.instance.collection('users').doc(state.bins[index].assingedTo).get(),
-                                              builder: (context, AsyncSnapshot snapshot) {
-                                                if (snapshot.connectionState == ConnectionState.done && !snapshot.hasData || snapshot.data == null) {
-                                                  return SizedBox(
-                                                    width: 200.0,
-                                                    height: 10,
-                                                    child: Shimmer.fromColors(
-                                                      baseColor: Colors.grey.shade300,
-                                                      highlightColor: Colors.grey.shade100,
-                                                      child: Container(
-                                                        height: 10,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(4),
-                                                          color: Colors.grey.shade300,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                                if (snapshot.data?.exists) {
-                                                  UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => BinDetails(bin: state.bins[index])));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [BoxShadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 6)]),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // const Text('User Name'),
+                                        Text(state.bins[index].name!,
+                                            style:
+                                                Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 8),
+                                        // const Text('Address'),
+                                        Text(state.bins[index].address!, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
 
-                                                  return Row(
-                                                    children: [
-                                                      Text("Assigned to:",
-                                                          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.black)),
-                                                      const SizedBox(width: 10),
-                                                      Text(userModel.name!,
-                                                          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                                                    ],
-                                                  );
-                                                }
-                                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                                  return SizedBox(
-                                                    width: 200.0,
-                                                    height: 10,
-                                                    child: Shimmer.fromColors(
-                                                      baseColor: Colors.grey.shade300,
-                                                      highlightColor: Colors.grey.shade100,
-                                                      child: Container(
-                                                        height: 10,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(4),
-                                                          color: Colors.grey.shade300,
+                                        state.bins[index].assingedTo == null
+                                            ? Row(
+                                                children: [
+                                                  Text("Assigned to:",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleSmall
+                                                          ?.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
+                                                  const SizedBox(width: 10),
+                                                  Text("No One", style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.red)),
+                                                ],
+                                              )
+                                            : FutureBuilder<DocumentSnapshot>(
+                                                future: FirebaseFirestore.instance.collection('users').doc(state.bins[index].assingedTo).get(),
+                                                builder: (context, AsyncSnapshot snapshot) {
+                                                  if (snapshot.connectionState == ConnectionState.done && !snapshot.hasData ||
+                                                      snapshot.data == null) {
+                                                    return SizedBox(
+                                                      width: 200.0,
+                                                      height: 10,
+                                                      child: Shimmer.fromColors(
+                                                        baseColor: Colors.grey.shade300,
+                                                        highlightColor: Colors.grey.shade100,
+                                                        child: Container(
+                                                          height: 10,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(4),
+                                                            color: Colors.grey.shade300,
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                }
-                                                return const SizedBox();
-                                              },
-                                            ),
-                                    ],
+                                                    );
+                                                  }
+                                                  if (snapshot.data?.exists) {
+                                                    UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
+
+                                                    return Row(
+                                                      children: [
+                                                        Text("Assigned to:",
+                                                            style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.black)),
+                                                        const SizedBox(width: 10),
+                                                        Text(userModel.name!,
+                                                            style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                                                      ],
+                                                    );
+                                                  }
+                                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                                    return SizedBox(
+                                                      width: 200.0,
+                                                      height: 10,
+                                                      child: Shimmer.fromColors(
+                                                        baseColor: Colors.grey.shade300,
+                                                        highlightColor: Colors.grey.shade100,
+                                                        child: Container(
+                                                          height: 10,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(4),
+                                                            color: Colors.grey.shade300,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  return const SizedBox();
+                                                },
+                                              ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  height: 84,
-                                  width: 84,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.grey.shade300,
+                                  Container(
+                                    height: 84,
+                                    width: 84,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.asset('assets/bin_icon.png'),
+                                    ),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Image.asset('assets/bin_icon.png'),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         );

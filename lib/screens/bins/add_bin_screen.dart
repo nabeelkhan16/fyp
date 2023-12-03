@@ -20,7 +20,7 @@ class AddBinScreen extends StatefulWidget {
 }
 
 class _AddBinScreenState extends State<AddBinScreen> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   LocationData locationData = LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
@@ -130,17 +130,18 @@ class _AddBinScreenState extends State<AddBinScreen> {
                     child: DropdownSearch<String>(
                       itemAsString: (item) => item.toString(),
                       asyncItems: (text) async {
-                        return await FirebaseFirestore.instance.collection("users").where("isCollector", isEqualTo: true).get().then((value) {
+                        return await FirebaseFirestore.instance.collection("users").where('accountType', isEqualTo: 'collector').get().then((value) {
                           List<String> list = [];
                           for (var element in value.docs) {
                             list.add(element.data()["name"]);
                           }
+
                           return list;
                         });
                       },
                       dropdownButtonProps: const DropdownButtonProps(color: Colors.white, icon: Icon(Icons.arrow_drop_down, color: Colors.white)),
-                      dropdownBuilder: (context, selectedItem) => Text(selectedItem != null ? selectedItem : 'Select Collector',
-                          style: TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      dropdownBuilder: (context, selectedItem) => Text(selectedItem ?? 'Select Collector',
+                          style: const TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold)),
                       popupProps: PopupProps.menu(
                         menuProps: MenuProps(clipBehavior: Clip.antiAlias, borderRadius: BorderRadius.circular(20.0), elevation: 5),
                         showSelectedItems: true,
@@ -180,43 +181,35 @@ class _AddBinScreenState extends State<AddBinScreen> {
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                          bottomLeft: Radius.circular(30),
+                      child: GoogleMap(
+                        markers: markers,
+                        zoomControlsEnabled: false,
+                        mapType: MapType.normal,
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(locationData.latitude!, locationData.longitude!),
+                          zoom: 14.4746,
                         ),
-                        child: GoogleMap(
-                          markers: markers,
-                          zoomControlsEnabled: false,
-                          mapType: MapType.normal,
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(locationData.latitude!, locationData.longitude!),
-                            zoom: 14.4746,
-                          ),
-                          onTap: (Value) async {
-                            setState(() {
-                              locationData = LocationData.fromMap({"latitude": Value.latitude, "longitude": Value.longitude});
-                              markers.clear();
-                              markers.add(Marker(
-                                  consumeTapEvents: true,
-                                  infoWindow: InfoWindow(title: _nameController.text, snippet: _addressController.text),
-                                  markerId: const MarkerId("1"),
-                                  position: LatLng(Value.latitude, Value.longitude)));
-                              Future.delayed(const Duration(seconds: 1), () {
-                                _controller.future.then((controller) {
-                                  setState(() {
-                                    controller.showMarkerInfoWindow(const MarkerId("1"));
-                                  });
+                        onTap: (Value) async {
+                          setState(() {
+                            locationData = LocationData.fromMap({"latitude": Value.latitude, "longitude": Value.longitude});
+                            markers.clear();
+                            markers.add(Marker(
+                                consumeTapEvents: true,
+                                infoWindow: InfoWindow(title: _nameController.text, snippet: _addressController.text),
+                                markerId: const MarkerId("1"),
+                                position: LatLng(Value.latitude, Value.longitude)));
+                            Future.delayed(const Duration(seconds: 1), () {
+                              _controller.future.then((controller) {
+                                setState(() {
+                                  controller.showMarkerInfoWindow(const MarkerId("1"));
                                 });
                               });
                             });
-                          },
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller.complete(controller);
-                          },
-                        ),
+                          });
+                        },
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
+                        },
                       ),
                     ),
                   ),

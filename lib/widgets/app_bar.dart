@@ -28,9 +28,9 @@ GlobalAppBar(BuildContext context,
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_ios,
-              color: Colors.black,
+              color: Colors.white,
             ),
           )
         : const SizedBox(),
@@ -49,7 +49,7 @@ GlobalAppBar(BuildContext context,
               const SizedBox(width: 5),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 18,
                 ),
@@ -60,7 +60,7 @@ GlobalAppBar(BuildContext context,
             title,
             style: TextStyle(
               color: Theme.of(context).scaffoldBackgroundColor,
-              fontSize: 28,
+              fontSize: 18,
             ),
           ),
     actions: [trallingWidget],

@@ -41,6 +41,7 @@ dependencies:
   location: ^5.0.3
   dropdown_search: ^5.0.6
   shimmer: ^3.0.0
+  syncfusion_flutter_gauges: ^23.2.6
 
   flutter:
     sdk: flutter
