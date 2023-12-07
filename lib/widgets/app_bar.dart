@@ -50,7 +50,7 @@ GlobalAppBar(BuildContext context,
               Text(
                 title,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 18,
                 ),
               ),

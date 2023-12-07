@@ -1,9 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
 import 'package:trash_collector/constant.dart';
+import 'package:trash_collector/models/chat_model.dart';
+import 'package:trash_collector/models/user_model.dart';
 import 'package:trash_collector/widgets/app_bar.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final ChatModel chat;
+  const ChatScreen({super.key, required this.chat});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -13,96 +20,105 @@ class _ChatScreenState extends State<ChatScreen> {
   final textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: GlobalAppBar(
-        context,
-        title: 'username',
-        leading: true,
-        chatcreen: true,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.blue.shade900,
+            Colors.blue.shade800,
+            Colors.blue.shade700,
+            Colors.blue.shade600,
+          ],
+        ),
       ),
-      body: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey.shade300,
-            child: const Icon(
-              Icons.person,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          const Text(
-            'username',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            'You and username became friends on 12/12/2021',
-            style: TextStyle(color: Colors.grey.shade600),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(
-            child: ListView(
-              children: const [
-                MessageBubble(
-                  text: 'hello this the seending text with mmultiple lines code is working fine ',
-                  isMe: true,
-                ),
-                MessageBubble(
-                  text: 'hello this the seending text',
-                  isMe: false,
-                ),
-                MessageBubble(
-                  text: 'hello this the seending text',
-                  isMe: true,
-                ),
-                MessageBubble(
-                  text: 'hello this the recieving text',
-                  isMe: false,
-                ),
-                MessageBubble(
-                  text: 'hello this the seending text',
-                  isMe: true,
-                ),
-                MessageBubble(
-                  text: 'hello this the seending text',
-                  isMe: false,
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.grey.shade200,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: GlobalAppBar(
+          context,
+          title: context.read<AuthenticationBloc>().userModel!.accountType == AccountType.user ? widget.chat.collectorName : widget.chat.userName,
+          leading: true,
+          chatcreen: true,
+        ),
+        body: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('chats')
+                .doc(widget.chat.chatId)
+                .collection('messages')
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return Column(
                 children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Expanded(
-                    child: TextFormField(
-                      controller: textController,
-                      decoration: kMessageTextField.copyWith(
-                        hintText: 'Type a message...',
+                      child: ListView.builder(
+                    reverse: true,
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final message = snapshot.data!.docs[index];
+                      return MessageBubble(
+                        text: message['text'],
+                        isMe: message['senderId'] == context.read<AuthenticationBloc>().userModel!.uId,
+                      );
+                    },
+                  )),
+                  Container(
+                    color: Colors.grey.shade200,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12).copyWith(bottom: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: textController,
+                              decoration: kMessageTextField.copyWith(
+                                hintText: 'Type a message...',
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send, color: Colors.blue),
+                            onPressed: () {
+                              if (textController.text.isNotEmpty) {
+                                FirebaseFirestore.instance.collection('chats').doc(widget.chat.chatId).collection('messages').add({
+                                  'text': textController.text,
+                                  'createdAt': Timestamp.now(),
+                                  'senderId': context.read<AuthenticationBloc>().userModel!.uId,
+                                  'receiverId': context.read<AuthenticationBloc>().userModel!.accountType == AccountType.user
+                                      ? widget.chat.collectorId
+                                      : widget.chat.userId,
+                                  'receiverName': context.read<AuthenticationBloc>().userModel!.accountType == AccountType.user
+                                      ? widget.chat.collectorName
+                                      : widget.chat.userName,
+                                  'userId': context.read<AuthenticationBloc>().userModel!.uId,
+                                  'userName': context.read<AuthenticationBloc>().userModel!.name,
+                                });
+                                FirebaseFirestore.instance.collection('chats').doc(widget.chat.chatId).update({
+                                  'lastMessage': textController.text,
+                                  'lastMessageTime': Timestamp.now(),
+                                });
+                              }
+
+                              textController.clear();
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      textController.clear();
-                    },
-                  ),
                 ],
-              ),
-            ),
-          ),
-        ],
+              );
+            }),
       ),
     );
   }
@@ -121,11 +137,11 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Material(
-            elevation: 5.0,
+            elevation: 2.0,
             borderRadius: BorderRadius.circular(10),
             // color: Colors.lightBlueAccent,
             // isMe! ? Colors.lightBlueAccent : Colors.white,
-            color: isMe ? Colors.blue.shade700 : Colors.grey.shade300,
+            color: isMe ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 10.0,

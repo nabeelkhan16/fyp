@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trash_collector/models/chat_model.dart';
 import 'package:trash_collector/screens/login_screen.dart';
 import 'package:trash_collector/screens/profile/profile.dart';
 import 'package:trash_collector/screens/profile/settings.dart';
@@ -17,7 +18,10 @@ class Routes {
       case '/userInformationForm':
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case '/chat':
-         return MaterialPageRoute(builder: (_) => const ChatScreen());  
+        return MaterialPageRoute<ChatScreen>(
+            builder: (_) => ChatScreen(
+                  chat: routeSettings.arguments as ChatModel,
+                ));
       case '/settings':
         return MaterialPageRoute(builder: (_) => const ProfileSettings());
       default:

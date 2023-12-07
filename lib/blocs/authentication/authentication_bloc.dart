@@ -31,8 +31,6 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
             emit(InCompleteUserProfiling());
           }
         });
-
-        emit(AuthenticationAuthenticated());
       } else {
         emit(AuthenticationUnauthenticated());
       }
