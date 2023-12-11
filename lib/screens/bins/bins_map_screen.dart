@@ -109,7 +109,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => BinDetails(bin: state.bins[index])));
                           },
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
