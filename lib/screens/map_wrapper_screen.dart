@@ -16,7 +16,7 @@ class MapScreenWrapper extends StatelessWidget {
     return switch (context.read<AuthenticationBloc>().userModel!.accountType!) {
       AccountType.collector => const BinMapScreen(),
       AccountType.user => const CollectorMapScreen(),
-      AccountType.admin => const CollectorMapScreen(),
+      AccountType.admin => const BinMapScreen(),
     };
   }
 }

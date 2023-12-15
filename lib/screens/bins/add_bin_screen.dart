@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,6 +27,7 @@ class _AddBinScreenState extends State<AddBinScreen> {
   LocationData locationData = LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
   Set<Marker> markers = {};
   UserModel collector = UserModel();
+  UserModel binUser = UserModel();
   @override
   void initState() {
     getLocation().then((value) {
@@ -169,6 +171,49 @@ class _AddBinScreenState extends State<AddBinScreen> {
                     ),
                   ),
                   Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+                    child: DropdownSearch<String>(
+                      itemAsString: (item) => item.toString(),
+                      asyncItems: (text) async {
+                        return await FirebaseFirestore.instance.collection("users").where('accountType', isEqualTo: 'user').get().then((value) {
+                          List<String> list = [];
+                          for (var element in value.docs) {
+                            list.add(element.data()["name"]);
+                          }
+
+                          return list;
+                        });
+                      },
+                      dropdownButtonProps: const DropdownButtonProps(color: Colors.white, icon: Icon(Icons.arrow_drop_down, color: Colors.white)),
+                      dropdownBuilder: (context, selectedItem) => Text(selectedItem ?? 'Select Bin User',
+                          style: const TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold)),
+                      popupProps: PopupProps.menu(
+                        menuProps: MenuProps(clipBehavior: Clip.antiAlias, borderRadius: BorderRadius.circular(20.0), elevation: 5),
+                        showSelectedItems: true,
+                        disabledItemFn: (String s) => s.startsWith('I'),
+                      ),
+                      dropdownDecoratorProps: DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.1),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: "country in menu mode",
+                        ),
+                      ),
+                      onChanged: (value) async {
+                        await FirebaseFirestore.instance.collection("users").where("name", isEqualTo: value).get().then((value) {
+                          setState(() {
+                            binUser = UserModel.fromMap(value.docs.first.data());
+                          });
+                        });
+                      },
+                      selectedItem: binUser.name,
+                    ),
+                  ),
+                  Padding(
                     padding: const EdgeInsets.all(12.0).copyWith(left: 30.0),
                     child: const Text("Select Bin Loaction", style: TextStyle(color: Colors.white, fontSize: 18.0)),
                   ),
@@ -231,22 +276,17 @@ class _AddBinScreenState extends State<AddBinScreen> {
                               text: "Add Bin",
                               isLoading: state is BinsLoading,
                               onPressed: () {
-                                DocumentReference ref = FirebaseFirestore.instance.collection("bins").doc();
                                 BlocProvider.of<BinsBloc>(context).add(AddBin(
                                   BinModel(
-                                    id: ref.id,
+                                    id: "",
                                     name: _nameController.text,
                                     address: _addressController.text,
                                     location: GeoPoint(locationData.latitude!, locationData.longitude!),
                                     assingedTo: collector.uId,
                                     assignedToName: collector.name,
+                                    binUser: binUser.uId,
                                   ),
                                 ));
-                                FirebaseFirestore.instance.collection("users").doc(collector.uId).update(
-                                  {
-                                    "assignedBins": FieldValue.arrayUnion([ref.id])
-                                  },
-                                );
                               },
                               color: Theme.of(context).primaryColor),
                         );

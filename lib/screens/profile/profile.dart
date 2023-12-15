@@ -21,7 +21,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  AccountType? accountType;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,7 +37,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       child: DefaultTabController(
-        length: 2,
+        length: context.read<AuthenticationBloc>().userModel?.accountType == AccountType.admin
+            ? 2
+            : context.read<AuthenticationBloc>().userModel?.accountType == AccountType.collector
+                ? 1
+                : 1,
         child: Scaffold(
           appBar: GlobalAppBar(
             context,
@@ -168,9 +171,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             : context.read<AuthenticationBloc>().userModel?.accountType == AccountType.collector
                                 ? [
                                     const Tab(
-                                      text: "REVIEWS",
-                                    ),
-                                    const Tab(
                                       text: "ASSIGNED BINS",
                                     ),
                                   ]
@@ -178,15 +178,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     const Tab(
                                       text: "Related BINS",
                                     ),
-                                    const Tab(
-                                      text: "ASSIGNED BINS",
-                                    ),
+                                    // const Tab(
+                                    //   text: "ASSIGNED BINS",
+                                    // ),
                                   ]),
                   ),
                 ),
               ];
             }),
-            body: accountType == AccountType.admin
+            body: context.read<AuthenticationBloc>().userModel?.accountType == AccountType.admin
                 ? _adminTabs()
                 : context.read<AuthenticationBloc>().userModel?.accountType == AccountType.collector
                     ? _collectorTabs()
@@ -199,66 +199,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _collectorTabs() {
     return TabBarView(children: [
+      // FutureBuilder(
+      //     future: FirebaseFirestore.instance.collection('users').where('accountType', isEqualTo: 'user').get(),
+      //     builder: (context, AsyncSnapshot snapshot) {
+      //       if (snapshot.connectionState == ConnectionState.waiting) {
+      //         return const Center(
+      //           child: CircularProgressIndicator.adaptive(),
+      //         );
+      //       }
+      //       if (snapshot.hasError) {
+      //         return const Center(
+      //           child: Text("Something went wrong"),
+      //         );
+      //       }
+      //       if (snapshot.hasData) {
+      //         QuerySnapshot data = snapshot.data as QuerySnapshot;
+      //         return ListView.builder(
+      //             itemCount: data.docs.length,
+      //             itemBuilder: (context, index) {
+      //               return Padding(
+      //                 padding: const EdgeInsets.all(8.0),
+      //                 child: ListTile(
+      //                   leading: Container(
+      //                     width: 50,
+      //                     height: 50,
+      //                     decoration: const BoxDecoration(
+      //                       shape: BoxShape.circle,
+      //                       color: Colors.white,
+      //                     ),
+      //                     child: const Icon(
+      //                       Icons.person,
+      //                       color: Colors.blue,
+      //                     ),
+      //                   ),
+      //                   title: Text(
+      //                     data.docs[index]['name'],
+      //                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 20),
+      //                   ),
+      //                   subtitle: Text(
+      //                     data.docs[index]['email'],
+      //                     overflow: TextOverflow.ellipsis,
+      //                     maxLines: 2,
+      //                     style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
+      //                   ),
+      //                 ),
+      //               );
+      //             });
+      //       }
+      //       return const Center(
+      //         child: Text("No Collector Found"),
+      //       );
+      //     }),
       FutureBuilder(
-          future: FirebaseFirestore.instance.collection('users').where('accountType', isEqualTo: 'user').get(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
-              );
-            }
-            if (snapshot.hasError) {
-              return const Center(
-                child: Text("Something went wrong"),
-              );
-            }
-            if (snapshot.hasData) {
-              QuerySnapshot data = snapshot.data as QuerySnapshot;
-              return ListView.builder(
-                  itemCount: data.docs.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        leading: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        title: Text(
-                          data.docs[index]['name'],
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 20),
-                        ),
-                        subtitle: Text(
-                          data.docs[index]['email'],
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    );
-                  });
-            }
-            return const Center(
-              child: Text("No Collector Found"),
-            );
-          }),
-      FutureBuilder(
-          future: FirebaseFirestore.instance.collection('bins').get(),
+          future: FirebaseFirestore.instance.collection('bins').where('assingedTo', isEqualTo: FirebaseAuth.instance.currentUser?.uid).get(),
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -299,13 +292,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
                         ),
                       ),
                     );
@@ -364,13 +350,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             maxLines: 2,
                             style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
                           ),
-                          trailing: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
                         ),
                       );
                     });
@@ -421,13 +400,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                             style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
                           ),
                         ),
                       );
@@ -445,65 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return TabBarView(
       children: [
         FutureBuilder(
-            future: FirebaseFirestore.instance.collection('users').where('accountType', isEqualTo: 'collector').get(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                );
-              }
-              if (snapshot.hasError) {
-                return const Center(
-                  child: Text("Something went wrong"),
-                );
-              }
-              if (snapshot.hasData) {
-                QuerySnapshot data = snapshot.data as QuerySnapshot;
-                return ListView.builder(
-                    itemCount: data.docs.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          leading: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          title: Text(
-                            data.docs[index]['name'],
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 20),
-                          ),
-                          subtitle: Text(
-                            data.docs[index]['email'],
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      );
-                    });
-              }
-              return const Center(
-                child: Text("No Collector Found"),
-              );
-            }),
-        FutureBuilder(
-            future: FirebaseFirestore.instance.collection('bins').get(),
+            future: FirebaseFirestore.instance.collection('bins').where('binUser', isEqualTo: FirebaseAuth.instance.currentUser?.uid).get(),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -545,21 +459,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             maxLines: 2,
                             style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
                           ),
-                          trailing: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
                         ),
                       );
                     });
               }
               return const Center(
-                child: Text("No Bin Found"),
+                child: Text("No Collector Found"),
               );
             }),
+        // FutureBuilder(
+        //     future: FirebaseFirestore.instance.collection('bins').get(),
+        //     builder: (context, AsyncSnapshot snapshot) {
+        //       if (snapshot.connectionState == ConnectionState.waiting) {
+        //         return const Center(
+        //           child: CircularProgressIndicator.adaptive(),
+        //         );
+        //       }
+        //       if (snapshot.hasError) {
+        //         return const Center(
+        //           child: Text("Something went wrong"),
+        //         );
+        //       }
+        //       if (snapshot.hasData) {
+        //         QuerySnapshot data = snapshot.data as QuerySnapshot;
+        //         return ListView.builder(
+        //             itemCount: data.docs.length,
+        //             itemBuilder: (context, index) {
+        //               return Padding(
+        //                 padding: const EdgeInsets.all(8.0),
+        //                 child: ListTile(
+        //                   leading: Container(
+        //                     width: 50,
+        //                     height: 50,
+        //                     decoration: const BoxDecoration(
+        //                       shape: BoxShape.circle,
+        //                       color: Colors.white,
+        //                     ),
+        //                     child: const Icon(
+        //                       Icons.person,
+        //                       color: Colors.blue,
+        //                     ),
+        //                   ),
+        //                   title: Text(
+        //                     data.docs[index]['name'],
+        //                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 20),
+        //                   ),
+        //                   subtitle: Text(
+        //                     data.docs[index]['address'],
+        //                     overflow: TextOverflow.ellipsis,
+        //                     maxLines: 2,
+        //                     style: TextStyle(color: Colors.white.withOpacity(.5), fontSize: 16),
+        //                   ),
+        //                 ),
+        //               );
+        //             });
+        //       }
+        //       return const Center(
+        //         child: Text("No Bin Found"),
+        //       );
+        //     }),
       ],
     );
   }

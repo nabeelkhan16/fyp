@@ -17,6 +17,7 @@ class BinModel {
   String? updatedAt;
   String? assingedTo;
   String? assignedToName;
+  String? binUser;
   BinModel({
     required this.id,
     this.name,
@@ -31,6 +32,7 @@ class BinModel {
     this.updatedAt,
     this.assingedTo,
     this.assignedToName,
+    this.binUser,
   });
 
   BinModel copyWith({
@@ -47,6 +49,8 @@ class BinModel {
     String? updatedAt,
     String? assingedTo,
     String? assignedToName,
+    String? binUser
+
   }) {
     return BinModel(
       id: id ?? this.id,
@@ -62,6 +66,7 @@ class BinModel {
       updatedAt: updatedAt ?? this.updatedAt,
       assingedTo: assingedTo ?? this.assingedTo,
       assignedToName: assignedToName ?? this.assignedToName,
+      binUser: binUser ?? this.binUser,
     );
   }
 
@@ -80,6 +85,7 @@ class BinModel {
       'updatedAt': updatedAt,
       'assingedTo': assingedTo,
       'assignedToName': assignedToName,
+      'binUser': binUser,
     };
   }
 
@@ -98,6 +104,7 @@ class BinModel {
       updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
       assingedTo: map['assingedTo'] != null ? map['assingedTo'] as String : null,
       assignedToName: map['assignedToName'] != null ? map['assignedToName'] as String : null,
+      binUser: map['binUser'] != null ? map['binUser'] as String : null,
     );
   }
 
