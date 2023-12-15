@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -28,10 +32,10 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
-
-   final fcmToken = await FirebaseMessaging.instance.getToken();
-  print('fcmToken: $fcmToken');
-
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({
+    'fcmToken': fcmToken,
+  });
   runApp(const MyApp());
 }
 
@@ -43,8 +47,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-   late final FirebaseMessaging _messaging;
-   late final int totalNotifications;
+  late final FirebaseMessaging _messaging;
+  late final int totalNotifications;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -104,11 +108,23 @@ class _MyAppState extends State<MyApp> {
           title: message.notification?.title,
           body: message.notification?.body,
         );
- 
+        print(message.notification.toString());
       });
+      
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      PushNotification notification = PushNotification(
+        title: message.notification?.title,
+        body: message.notification?.body,
+      );
+         print(message.notification.toString());
+      });
+
+      FirebaseMessaging.onBackgroundMessage((message) async {
+        print(message.notification.toString());
+      });
+
     } else {
       print('User declined or has not accepted permission');
     }
   }
-  
 }

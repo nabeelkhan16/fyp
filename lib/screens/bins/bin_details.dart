@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -9,7 +8,7 @@ import 'package:trash_collector/widgets/app_bar.dart';
 class BinDetails extends StatefulWidget {
   final BinModel bin;
   const BinDetails({Key? key, required this.bin}) : super(key: key);
-
+ 
   @override
   State<BinDetails> createState() => _BinDetailsState();
 }
