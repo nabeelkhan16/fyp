@@ -33,9 +33,12 @@ void main() async {
   ));
 
   final fcmToken = await FirebaseMessaging.instance.getToken();
-  await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({
-    'fcmToken': fcmToken,
-  });
+  if (FirebaseAuth.instance.currentUser != null) {
+    await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).update({
+      'fcmToken': fcmToken,
+    });
+  }
+  
   runApp(const MyApp());
 }
 
@@ -110,19 +113,18 @@ class _MyAppState extends State<MyApp> {
         );
         print(message.notification.toString());
       });
-      
+
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      PushNotification notification = PushNotification(
-        title: message.notification?.title,
-        body: message.notification?.body,
-      );
-         print(message.notification.toString());
+        PushNotification notification = PushNotification(
+          title: message.notification?.title,
+          body: message.notification?.body,
+        );
+        print(message.notification.toString());
       });
 
       FirebaseMessaging.onBackgroundMessage((message) async {
         print(message.notification.toString());
       });
-
     } else {
       print('User declined or has not accepted permission');
     }
