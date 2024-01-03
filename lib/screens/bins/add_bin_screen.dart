@@ -77,7 +77,6 @@ class _AddBinScreenState extends State<AddBinScreen> {
               ),
             ),
             child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
