@@ -43,6 +43,7 @@ dependencies:
   shimmer: ^3.0.0
   syncfusion_flutter_gauges: ^23.2.6
   firebase_messaging: ^14.7.8
+  flutter_local_notifications: ^16.3.0
 
   flutter:
     sdk: flutter

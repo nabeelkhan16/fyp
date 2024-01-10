@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
 import 'package:trash_collector/blocs/bin/bins_bloc.dart';
 import 'package:trash_collector/configs/routes.dart';
@@ -19,12 +20,13 @@ import 'package:trash_collector/screens/user_information_form.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
@@ -32,15 +34,16 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  if (FirebaseAuth.instance.currentUser != null) {
-    await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).update({
-      'fcmToken': fcmToken,
-    });
-  }
-  
   runApp(const MyApp());
 }
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  description: 'This channel is used for important notifications.', // description
+  importance: Importance.high,
+);
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -50,8 +53,69 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final FirebaseMessaging _messaging;
-  late final int totalNotifications;
+  @override
+  void initState() {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+//request permission to use firebase messaging
+    messaging
+        .requestPermission(
+          alert: true,
+          announcement: false,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        )
+        .then((value) => log(value.toString()));
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log('A new onMessage event was published!');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channelDescription: channel.description,
+                icon: 'ic_launcher',
+
+                
+              ),
+            ));
+      }
+
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        log('A new onMessageOpenedApp event was published!');
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
+        if (notification != null && android != null) {
+          flutterLocalNotificationsPlugin.show(
+              notification.hashCode,
+              notification.title,
+              notification.body,
+              NotificationDetails(
+                android: AndroidNotificationDetails(channel.id, channel.name, channelDescription: channel.description, icon: 'ic_launcher'),
+              ));
+        }
+      });
+    });
+
+    super.initState();
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -89,44 +153,20 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void registerNotification() async {
-    // 1. Initialize the Firebase app
-    await Firebase.initializeApp();
-
-    // 2. Instantiate Firebase Messaging
-    _messaging = FirebaseMessaging.instance;
-
-    // 3. On iOS, this helps to take the user permissions
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      provisional: false,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        // Parse the message received
-        PushNotification notification = PushNotification(
-          title: message.notification?.title,
-          body: message.notification?.body,
-        );
-        print(message.notification.toString());
-      });
-
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        PushNotification notification = PushNotification(
-          title: message.notification?.title,
-          body: message.notification?.body,
-        );
-        print(message.notification.toString());
-      });
-
-      FirebaseMessaging.onBackgroundMessage((message) async {
-        print(message.notification.toString());
-      });
-    } else {
-      print('User declined or has not accepted permission');
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) {
+    log('A new onMessageOpenedApp event was published!');
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name, channelDescription: channel.description, icon: 'ic_launcher'),
+          ));
     }
+
+    return Future<void>.value();
   }
 }
