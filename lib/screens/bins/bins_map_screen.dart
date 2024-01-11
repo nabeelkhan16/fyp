@@ -39,7 +39,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
             CameraUpdate.newCameraPosition(
               CameraPosition(
                 target: LatLng(currentBin!.location!.latitude, currentBin!.location!.longitude),
-                zoom: 14.0,
+                zoom: 20.0,
               ),
             ),
           ));
@@ -57,7 +57,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
               if (state.bins.isNotEmpty) {
                 _kGooglePlex = CameraPosition(
                   target: LatLng(state.bins.first.location!.latitude, state.bins.first.location!.longitude),
-                  zoom: 14.4746,
+                  zoom: 20.4746,
                 );
               }
 
@@ -65,7 +65,6 @@ class _BinMapScreenState extends State<BinMapScreen> {
                 children: [
                   GoogleMap(
                     zoomControlsEnabled: false,
-                    myLocationButtonEnabled: false,
                     markers: state.bins
                         .map((e) => Marker(
                               markerId: MarkerId(e.id),
@@ -77,7 +76,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
                               ),
                             ))
                         .toSet(),
-                    mapType: MapType.normal,
+                    mapType: MapType.hybrid,
                     initialCameraPosition: _kGooglePlex,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
@@ -88,17 +87,15 @@ class _BinMapScreenState extends State<BinMapScreen> {
                     width: MediaQuery.of(context).size.width,
                     bottom: 18,
                     child: PageView.builder(
-                      onPageChanged: (value) {
-                        setState(() {
-                          _mapController?.moveCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: LatLng(state.bins[value].location!.latitude, state.bins[value].location!.longitude),
-                                zoom: 14.0,
-                              ),
+                      onPageChanged: (value)async {
+                        _mapController?.moveCamera(
+                     await     CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                              target: LatLng(state.bins[value].location!.latitude, state.bins[value].location!.longitude),
+                              zoom: 20.0,
                             ),
-                          );
-                        });
+                          ),
+                        );
                       },
                       itemCount: state.bins.length,
                       controller: _pageController,

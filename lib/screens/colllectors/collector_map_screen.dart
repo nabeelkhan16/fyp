@@ -33,16 +33,16 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
   void initState() {
     context.read<CollectorBloc>().add(LoadAllCollectors());
 
-    _pageController.addListener(() {
-      _controller.future.then((value) => value.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: LatLng(currentCollector!.location!.latitude, currentCollector!.location!.longitude),
-                zoom: 14.0,
-              ),
-            ),
-          ));
-    });
+    // _pageController.addListener(() async{
+    // await  _controller.future.then((value)async => value.animateCamera(
+    //        await CameraUpdate.newCameraPosition(
+    //           CameraPosition(
+    //             target: LatLng(currentCollector!.location!.latitude, currentCollector!.location!.longitude),
+    //             zoom: 14.0,
+    //           ),
+    //         ),
+    //       ));
+    // });
     super.initState();
   }
 
@@ -84,9 +84,7 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
                   mapType: MapType.normal,
                   initialCameraPosition: _kGooglePlex,
                   onMapCreated: (GoogleMapController controller) {
-                    if (!_controller.isCompleted) {
-                      _controller.complete(controller);
-                    }
+                    _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
                   },
                 ),
                 Positioned(
@@ -94,17 +92,16 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
                   width: MediaQuery.of(context).size.width,
                   bottom: 18,
                   child: PageView.builder(
-                    onPageChanged: (value) {
-                      setState(() {
-                        _mapController?.moveCamera(
-                          CameraUpdate.newCameraPosition(
-                            CameraPosition(
-                              target: LatLng(state.collectors[value].location!.latitude, state.collectors[value].location!.longitude),
-                              zoom: 14.0,
-                            ),
+                    onPageChanged: (value) async {
+                      print(state.collectors[value].location!.latitude);
+                      await _mapController?.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: LatLng(state.collectors[value].location!.latitude, state.collectors[value].location!.longitude),
+                            zoom: 14.0,
                           ),
-                        );
-                      });
+                        ),
+                      );
                     },
                     itemCount: state.collectors.length,
                     controller: _pageController,
