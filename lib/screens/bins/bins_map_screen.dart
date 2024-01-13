@@ -23,7 +23,7 @@ class BinMapScreen extends StatefulWidget {
 class _BinMapScreenState extends State<BinMapScreen> {
   final PageController _pageController = PageController(initialPage: 0, viewportFraction: 0.8);
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-  GoogleMapController? _mapController;
+
   BinModel? currentBin;
   CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -34,16 +34,6 @@ class _BinMapScreenState extends State<BinMapScreen> {
   void initState() {
     context.read<BinsBloc>().add(GetAllBins());
 
-    _pageController.addListener(() {
-      _controller.future.then((value) => value.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: LatLng(currentBin!.location!.latitude, currentBin!.location!.longitude),
-                zoom: 20.0,
-              ),
-            ),
-          ));
-    });
     super.initState();
   }
 
@@ -57,7 +47,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
               if (state.bins.isNotEmpty) {
                 _kGooglePlex = CameraPosition(
                   target: LatLng(state.bins.first.location!.latitude, state.bins.first.location!.longitude),
-                  zoom: 20.4746,
+                  zoom: 13,
                 );
               }
 
@@ -76,7 +66,7 @@ class _BinMapScreenState extends State<BinMapScreen> {
                               ),
                             ))
                         .toSet(),
-                    mapType: MapType.hybrid,
+                    mapType: MapType.normal,
                     initialCameraPosition: _kGooglePlex,
                     onMapCreated: (GoogleMapController controller) {
                       _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
@@ -87,12 +77,13 @@ class _BinMapScreenState extends State<BinMapScreen> {
                     width: MediaQuery.of(context).size.width,
                     bottom: 18,
                     child: PageView.builder(
-                      onPageChanged: (value)async {
-                        _mapController?.moveCamera(
-                     await     CameraUpdate.newCameraPosition(
+                      onPageChanged: (value) async {
+                        final GoogleMapController controller = await _controller.future;
+                        await controller.animateCamera(
+                          CameraUpdate.newCameraPosition(
                             CameraPosition(
                               target: LatLng(state.bins[value].location!.latitude, state.bins[value].location!.longitude),
-                              zoom: 20.0,
+                              zoom: 13.0,
                             ),
                           ),
                         );

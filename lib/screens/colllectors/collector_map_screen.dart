@@ -22,11 +22,11 @@ class CollectorMapScreen extends StatefulWidget {
 class _CollectorMapScreenState extends State<CollectorMapScreen> {
   final PageController _pageController = PageController(initialPage: 0, viewportFraction: 0.8);
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-  GoogleMapController? _mapController;
+
   UserModel? currentCollector;
   CameraPosition _kGooglePlex = const CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
+    zoom: 13,
   );
 
   @override
@@ -56,12 +56,12 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
             if (state.collectors.isNotEmpty) {
               _kGooglePlex = CameraPosition(
                 target: LatLng(state.collectors[0].location!.latitude, state.collectors[0].location!.longitude),
-                zoom: 14.4746,
+                zoom: 13,
               );
             } else {
               _kGooglePlex = const CameraPosition(
                 target: LatLng(37.42796133580664, -122.085749655962),
-                zoom: 14.4746,
+                zoom: 13,
               );
             }
 
@@ -81,7 +81,7 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
                             ),
                           ))
                       .toSet(),
-                  mapType: MapType.normal,
+                  mapType: MapType.hybrid,
                   initialCameraPosition: _kGooglePlex,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
@@ -93,12 +93,12 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
                   bottom: 18,
                   child: PageView.builder(
                     onPageChanged: (value) async {
-                      print(state.collectors[value].location!.latitude);
-                      await _mapController?.animateCamera(
+                      final GoogleMapController controller = await _controller.future;
+                      await controller.animateCamera(
                         CameraUpdate.newCameraPosition(
                           CameraPosition(
                             target: LatLng(state.collectors[value].location!.latitude, state.collectors[value].location!.longitude),
-                            zoom: 14.0,
+                            zoom: 12.0,
                           ),
                         ),
                       );

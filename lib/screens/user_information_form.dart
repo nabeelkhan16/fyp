@@ -75,7 +75,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 50.0),
+                const SizedBox(height: 10.0),
                 Center(
                   child: ToggleSwitch(
                     minWidth: MediaQuery.of(context).size.width * 0.5,
@@ -103,7 +103,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     },
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 15.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: TextField(
@@ -122,7 +122,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: TextField(
@@ -141,7 +141,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: TextField(
@@ -160,7 +160,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: TextField(
@@ -179,7 +179,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: TextField(
@@ -198,49 +198,50 @@ class _UserInformationFormState extends State<UserInformationForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
                 _isCollector == 1
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: SizedBox(
-                          height: 350,
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GoogleMap(
-                                zoomControlsEnabled: false,
-                                mapType: MapType.normal,
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0),
-                                  zoom: 16.4746,
-                                ),
-                                onMapCreated: (GoogleMapController controller) {
-                                  _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
-                                },
-                                markers: markers,
-                                onTap: (LatLng latLng) {
-                                  setState(() {
-                                    markers.clear();
-                                    markers.add(Marker(
-                                      markerId: const MarkerId('1'),
-                                      position: latLng,
-                                    ));
-                                  });
-                                  _controller.future.then(
-                                    (controller) {
-                                      controller.animateCamera(CameraUpdate.newCameraPosition(
-                                        CameraPosition(
-                                          target: latLng,
-                                          zoom: 16.4746,
-                                        ),
+                    ? Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ClipRRect(
+                            clipBehavior: Clip.antiAlias,
+                            borderRadius: const BorderRadius.all(Radius.circular(30)),
+                            child: SizedBox(
+                              height: 250,
+                              child: GoogleMap(
+                                  zoomControlsEnabled: false,
+                                  mapType: MapType.normal,
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0),
+                                    zoom: 16,
+                                  ),
+                                  onMapCreated: (GoogleMapController controller) {
+                                    _controller.isCompleted
+                                        ? _controller.future.then((value) => value = controller)
+                                        : _controller.complete(controller);
+                                  },
+                                  markers: markers,
+                                  onTap: (LatLng latLng) {
+                                    setState(() {
+                                      markers.clear();
+                                      markers.add(Marker(
+                                        markerId: const MarkerId('1'),
+                                        position: latLng,
                                       ));
-                                    },
-                                  );
-                                }),
-                          ),
-                        ))
+                                    });
+                                    _controller.future.then(
+                                      (controller) {
+                                        controller.animateCamera(CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                            target: latLng,
+                                            zoom: 16,
+                                          ),
+                                        ));
+                                      },
+                                    );
+                                  }),
+                            )))
                     : const SizedBox(),
-                const SizedBox(height: 30.0),
+                const SizedBox(height: 15.0),
                 Center(
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -248,7 +249,7 @@ class _UserInformationFormState extends State<UserInformationForm> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 100.0),
                       ),
                       onPressed: () {
                         BlocProvider.of<AuthenticationBloc>(context).add(SaveUserProfile(UserModel(

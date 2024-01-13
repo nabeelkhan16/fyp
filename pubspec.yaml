@@ -37,7 +37,7 @@ dependencies:
   path_provider: ^2.1.1
   cached_network_image: ^3.3.0
   toggle_switch: ^2.1.0
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.5.3
   location: ^5.0.3
   dropdown_search: ^5.0.6
   shimmer: ^3.0.0
