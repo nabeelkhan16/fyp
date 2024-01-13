@@ -81,7 +81,7 @@ class _CollectorMapScreenState extends State<CollectorMapScreen> {
                             ),
                           ))
                       .toSet(),
-                  mapType: MapType.hybrid,
+                  mapType: MapType.normal,
                   initialCameraPosition: _kGooglePlex,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.isCompleted ? _controller.future.then((value) => value = controller) : _controller.complete(controller);
