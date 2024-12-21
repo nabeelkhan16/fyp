@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,8 +21,8 @@ class AddBinScreen extends StatefulWidget {
 
 class _AddBinScreenState extends State<AddBinScreen> {
   final Completer<GoogleMapController> _controller = Completer();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _addressController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
   LocationData locationData = LocationData.fromMap({"latitude": 0.0, "longitude": 0.0});
   Set<Marker> markers = {};
   UserModel collector = UserModel();
@@ -232,15 +231,15 @@ class _AddBinScreenState extends State<AddBinScreen> {
                           target: LatLng(locationData.latitude!, locationData.longitude!),
                           zoom: 13,
                         ),
-                        onTap: (Value) async {
+                        onTap: (value) async {
                           setState(() {
-                            locationData = LocationData.fromMap({"latitude": Value.latitude, "longitude": Value.longitude});
+                            locationData = LocationData.fromMap({"latitude": value.latitude, "longitude": value.longitude});
                             markers.clear();
                             markers.add(Marker(
                                 consumeTapEvents: true,
                                 infoWindow: InfoWindow(title: _nameController.text, snippet: _addressController.text),
                                 markerId: const MarkerId("1"),
-                                position: LatLng(Value.latitude, Value.longitude)));
+                                position: LatLng(value.latitude, value.longitude)));
                             Future.delayed(const Duration(seconds: 1), () {
                               _controller.future.then((controller) {
                                 setState(() {

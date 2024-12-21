@@ -1,6 +1,5 @@
 import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:trash_collector/blocs/authentication/authentication_bloc.dart';
 import 'package:trash_collector/blocs/bin/bins_bloc.dart';
 import 'package:trash_collector/configs/routes.dart';
-import 'package:trash_collector/models/bin_model.dart';
 import 'package:trash_collector/screens/colllectors/bloc/collector_bloc.dart';
 import 'package:trash_collector/screens/home_screen_navigator.dart';
 import 'package:trash_collector/screens/login_screen.dart';
@@ -39,10 +37,12 @@ void main() async {
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
-  description: 'This channel is used for important notifications.', // description
+  description:
+      'This channel is used for important notifications.', // description
   importance: Importance.high,
 );
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -55,7 +55,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -88,13 +89,12 @@ class _MyAppState extends State<MyApp> {
                 channel.name,
                 channelDescription: channel.description,
                 icon: 'ic_launcher',
-
-                
               ),
             ));
       }
 
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler);
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         log('A new onMessageOpenedApp event was published!');
@@ -106,7 +106,9 @@ class _MyAppState extends State<MyApp> {
               notification.title,
               notification.body,
               NotificationDetails(
-                android: AndroidNotificationDetails(channel.id, channel.name, channelDescription: channel.description, icon: 'ic_launcher'),
+                android: AndroidNotificationDetails(channel.id, channel.name,
+                    channelDescription: channel.description,
+                    icon: 'ic_launcher'),
               ));
         }
       });
@@ -120,7 +122,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => AuthenticationBloc()..add(AuthenticationCheck())),
+        BlocProvider(
+            create: (_) => AuthenticationBloc()..add(AuthenticationCheck())),
         BlocProvider(create: (_) => CollectorBloc()),
         BlocProvider(create: (_) => BinsBloc()),
       ],
@@ -162,7 +165,8 @@ class _MyAppState extends State<MyApp> {
           notification.title,
           notification.body,
           NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name, channelDescription: channel.description, icon: 'ic_launcher'),
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description, icon: 'ic_launcher'),
           ));
     }
 

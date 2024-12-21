@@ -1,6 +1,7 @@
-import 'package:bloc/bloc.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:trash_collector/models/user_model.dart';
 
@@ -17,9 +18,9 @@ class CollectorBloc extends Bloc<CollectorEvent, CollectorState> {
     try {
       await FirebaseFirestore.instance.collection('users').where('accountType', isEqualTo: 'collector').get().then((value) async {
         List<UserModel> collectors = [];
-        value.docs.forEach((element) {
+        for (var element in value.docs) {
           collectors.add(UserModel.fromMap(element.data()));
-        });
+        }
         emit(CollectorLoaded(collectors));
       });
     } catch (e) {
